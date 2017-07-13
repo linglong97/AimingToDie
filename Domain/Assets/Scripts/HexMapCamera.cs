@@ -58,10 +58,10 @@ public class HexMapCamera : MonoBehaviour {
 		
 		zoom = Mathf.Clamp01 (zoom + delta);
 		float distance = Mathf.Lerp (stickMinZoom, stickMaxZoom, zoom); // distance viewing from camera
-		stick.localPosition = new Vector3 (0f, 0f, distance);
+		stick.localPosition = new Vector3 (0f, 0f, distance/5);
 
-		float angle = Mathf.Lerp (swivelMin, swivelMax, zoom);
-		swivel.localRotation = Quaternion.Euler (angle, 0f, 0f);	// convert swivel angle to angle
+		//float angle = Mathf.Lerp (swivelMin, swivelMax, zoom);
+		//swivel.localRotation = Quaternion.Euler (angle, 0f, 0f);	// convert swivel angle to angle
 	}
 
 

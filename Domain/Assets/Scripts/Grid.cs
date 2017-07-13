@@ -7,13 +7,9 @@ public class Grid : MonoBehaviour {
 	public int zsize;
 	public GridTile[,] gridArray;
 	public Vector2 activeTilePos;
+	public Vector2 prevActiveTilePos;
+	public bool movementFlag = false;
 
-	/*public Grid (int _xsize, int _zsize, GameObject _hexPrefab){
-		xsize = _xsize;
-		zsize = _zsize;
-		gridArray = new GridTile[xsize,zsize];
-		hexPrefab = _hexPrefab;
-	}*/
 	public void generateGrid(){
 		for (int i=0; i<xsize; i++){
 			for (int j=0; j<zsize; j++){
@@ -23,35 +19,44 @@ public class Grid : MonoBehaviour {
 		}
 		gridArray [0, 0].setUnit ();
 		activeTilePos = new Vector2 (-1, -1);
+		prevActiveTilePos = new Vector2 (-1, -1);
 	}
 
 	void Start () {
-		//Grid gameGrid = new Grid(xsize, zsize, hexPrefab);
 		gridArray = new GridTile[xsize,zsize];
 		generateGrid();
 	}
 
+	void ChangeHeight(int xcoord, int ycoord, int height){
+		gridArray[xcoord, ycoord].tile.transform.position = 
+			new Vector3 (gridArray [xcoord, ycoord].tile.transform.position.x, 
+				height, gridArray [xcoord, ycoord].tile.transform.position.z);
+	}
+			
 	public void changeActiveTile(Vector3 pos){
-		float xfactor = 0.882f;
-		float zfactor = 0.764f;
-		float xcorrection = 0.441f;
-
-		float xPos;
-		int zPos;
-
-		zPos = (int)(pos.z / zfactor);
-		if (zPos % 2 == 1) {
-			pos.x -= xcorrection;
-		}
-		xPos = pos.x / xfactor;
+		Vector2 coords = new Vector2();
+		coords = GridTile.convertToGrid(pos);
+		int xPos = (int)coords.x;
+		int zPos = (int)coords.y;
 
 		if (activeTilePos != new Vector2 (-1, -1)){
-			gridArray [(int)activeTilePos.x, (int)activeTilePos.y].tile.transform.position = 
-				new Vector3 (gridArray [(int)activeTilePos.x, (int)activeTilePos.y].tile.transform.position.x, 0, gridArray [(int)activeTilePos.x, (int)activeTilePos.y].tile.transform.position.z);
+			ChangeHeight ((int)activeTilePos.x, (int)activeTilePos.y, (int)0);
 		}
-		gridArray[(int)xPos,(int)zPos].tile.transform.position=  
-			new Vector3 (gridArray [(int)xPos,(int)zPos].tile.transform.position.x, 1, gridArray [(int)xPos,(int)zPos].tile.transform.position.z);
-
+		ChangeHeight (xPos, zPos, 1);
+		prevActiveTilePos = activeTilePos;
 		activeTilePos = new Vector2 (xPos, zPos);
 	}
+
+	public void setMovementFlag(){
+		if ((prevActiveTilePos != activeTilePos)&(activeTilePos!=new Vector2 (-1, -1)))
+				movementFlag = true;
+	}
+
+	public void movement(){
+		gridArray [(int)prevActiveTilePos.x, (int)prevActiveTilePos.y].destroyUnit ();
+		gridArray [(int)activeTilePos.x, (int)activeTilePos.y].setUnit();
+		movementFlag = false;
+	}
+		
+
 }
